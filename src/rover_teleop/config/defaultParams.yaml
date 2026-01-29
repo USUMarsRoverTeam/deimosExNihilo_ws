@@ -1,0 +1,12 @@
+armOps:
+  ros__parameters:
+    velocity_scale: 750.0
+    wrist_velocity_scale: 250.0
+    hand_velocity_scale: 350.0
+
+drivetrainOps:
+  ros__parameters:
+    axis_linear: 5
+    axis_angular: 4
+    linear_speed_scale: 0.2
+    angular_speed_scale: 0.5
