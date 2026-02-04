@@ -1,0 +1,13 @@
+# Target labels
+ spdlog
+# Source files and their labels
+/home/deimos/deimosExNihilo_ws/build/micro_ros_agent/agent/src/xrceagent-build/CMakeFiles/spdlog
+/home/deimos/deimosExNihilo_ws/build/micro_ros_agent/agent/src/xrceagent-build/CMakeFiles/spdlog.rule
+/home/deimos/deimosExNihilo_ws/build/micro_ros_agent/agent/src/xrceagent-build/CMakeFiles/spdlog-complete.rule
+/home/deimos/deimosExNihilo_ws/build/micro_ros_agent/agent/src/xrceagent-build/spdlog/src/spdlog-stamp/spdlog-build.rule
+/home/deimos/deimosExNihilo_ws/build/micro_ros_agent/agent/src/xrceagent-build/spdlog/src/spdlog-stamp/spdlog-configure.rule
+/home/deimos/deimosExNihilo_ws/build/micro_ros_agent/agent/src/xrceagent-build/spdlog/src/spdlog-stamp/spdlog-download.rule
+/home/deimos/deimosExNihilo_ws/build/micro_ros_agent/agent/src/xrceagent-build/spdlog/src/spdlog-stamp/spdlog-install.rule
+/home/deimos/deimosExNihilo_ws/build/micro_ros_agent/agent/src/xrceagent-build/spdlog/src/spdlog-stamp/spdlog-mkdir.rule
+/home/deimos/deimosExNihilo_ws/build/micro_ros_agent/agent/src/xrceagent-build/spdlog/src/spdlog-stamp/spdlog-patch.rule
+/home/deimos/deimosExNihilo_ws/build/micro_ros_agent/agent/src/xrceagent-build/spdlog/src/spdlog-stamp/spdlog-update.rule

@@ -1,0 +1,19 @@
+[0.010s] Invoking command in '/home/deimos/deimosExNihilo_ws/build/rover_teleop': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake /home/deimos/deimosExNihilo_ws/src/rover_teleop -DCMAKE_INSTALL_PREFIX=/home/deimos/deimosExNihilo_ws/install/rover_teleop
+[0.028s] -- Found ament_cmake: 2.5.5 (/opt/ros/jazzy/share/ament_cmake/cmake)
+[0.331s] -- Found rclpy: 7.1.9 (/opt/ros/jazzy/share/rclpy/cmake)
+[0.332s] -- Found sensor_msgs: 5.3.6 (/opt/ros/jazzy/share/sensor_msgs/cmake)
+[0.362s] -- Found rosidl_generator_c: 4.6.7 (/opt/ros/jazzy/share/rosidl_generator_c/cmake)
+[0.372s] -- Found rosidl_generator_cpp: 4.6.7 (/opt/ros/jazzy/share/rosidl_generator_cpp/cmake)
+[0.385s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[0.401s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[0.598s] [31mCMake Error at /opt/ros/jazzy/share/ament_cmake_python/cmake/ament_python_install_package.cmake:66 (message):
+[0.598s]   ament_python_install_package() the Python package folder
+[0.599s]   '/home/deimos/deimosExNihilo_ws/src/rover_teleop/rover_teleop' doesn't
+[0.599s]   contain an '__init__.py' file
+[0.599s] Call Stack (most recent call first):
+[0.599s]   /opt/ros/jazzy/share/ament_cmake_python/cmake/ament_python_install_package.cmake:39 (_ament_cmake_python_install_package)
+[0.599s]   CMakeLists.txt:17 (ament_python_install_package)
+[0.599s] 
+[0.599s] [0m
+[0.599s] -- Configuring incomplete, errors occurred!
+[0.606s] Invoked command in '/home/deimos/deimosExNihilo_ws/build/rover_teleop' returned '1': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake /home/deimos/deimosExNihilo_ws/src/rover_teleop -DCMAKE_INSTALL_PREFIX=/home/deimos/deimosExNihilo_ws/install/rover_teleop

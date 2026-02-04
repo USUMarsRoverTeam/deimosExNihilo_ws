@@ -1,0 +1,32 @@
+[0.010s] Invoking command in '/home/deimos/deimosExNihilo_ws/build/rover_teleop': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake /home/deimos/deimosExNihilo_ws/src/rover_teleop -DCMAKE_INSTALL_PREFIX=/home/deimos/deimosExNihilo_ws/install/rover_teleop
+[0.087s] -- The C compiler identification is GNU 13.3.0
+[0.174s] -- The CXX compiler identification is GNU 13.3.0
+[0.202s] -- Detecting C compiler ABI info
+[0.341s] -- Detecting C compiler ABI info - done
+[0.365s] -- Check for working C compiler: /usr/bin/cc - skipped
+[0.365s] -- Detecting C compile features
+[0.366s] -- Detecting C compile features - done
+[0.383s] -- Detecting CXX compiler ABI info
+[0.560s] -- Detecting CXX compiler ABI info - done
+[0.578s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[0.578s] -- Detecting CXX compile features
+[0.579s] -- Detecting CXX compile features - done
+[0.581s] -- Found ament_cmake: 2.5.5 (/opt/ros/jazzy/share/ament_cmake/cmake)
+[0.783s] -- Found Python3: /usr/bin/python3 (found version "3.12.3") found components: Interpreter 
+[0.909s] -- Found rclpy: 7.1.9 (/opt/ros/jazzy/share/rclpy/cmake)
+[0.911s] -- Found sensor_msgs: 5.3.6 (/opt/ros/jazzy/share/sensor_msgs/cmake)
+[0.963s] -- Found rosidl_generator_c: 4.6.7 (/opt/ros/jazzy/share/rosidl_generator_c/cmake)
+[0.978s] -- Found rosidl_generator_cpp: 4.6.7 (/opt/ros/jazzy/share/rosidl_generator_cpp/cmake)
+[0.996s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[1.016s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[1.287s] [31mCMake Error at /opt/ros/jazzy/share/ament_cmake_python/cmake/ament_python_install_package.cmake:66 (message):
+[1.287s]   ament_python_install_package() the Python package folder
+[1.287s]   '/home/deimos/deimosExNihilo_ws/src/rover_teleop/rover_teleop' doesn't
+[1.287s]   contain an '__init__.py' file
+[1.287s] Call Stack (most recent call first):
+[1.288s]   /opt/ros/jazzy/share/ament_cmake_python/cmake/ament_python_install_package.cmake:39 (_ament_cmake_python_install_package)
+[1.288s]   CMakeLists.txt:17 (ament_python_install_package)
+[1.288s] 
+[1.288s] [0m
+[1.288s] -- Configuring incomplete, errors occurred!
+[1.295s] Invoked command in '/home/deimos/deimosExNihilo_ws/build/rover_teleop' returned '1': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake /home/deimos/deimosExNihilo_ws/src/rover_teleop -DCMAKE_INSTALL_PREFIX=/home/deimos/deimosExNihilo_ws/install/rover_teleop
