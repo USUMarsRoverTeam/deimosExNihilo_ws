@@ -21,37 +21,29 @@ rclc_support_t support;
 rcl_allocator_t allocator;
 rcl_node_t node;
 
-rcl_subscription_t sub_twist;
-rcl_subscription_t sub_arm;
+// rcl_subscription_t sub_twist;
+// rcl_subscription_t sub_arm;
 rcl_subscription_t sub_arm_vel;
 rcl_subscription_t sub_arm_home;
-rcl_subscription_t sub_science;
-rcl_subscription_t sub_syringe;
-rcl_subscription_t sub_carousel;
-rcl_subscription_t sub_camera;
 
-rcl_publisher_t pub_temp;
-rcl_publisher_t pub_humidity;
 rcl_publisher_t pub_arm_pos;
 
-geometry_msgs__msg__Twist drivetrain_msg;
-std_msgs__msg__UInt16MultiArray arm_msg, camera_msg;
-std_msgs__msg__Float32MultiArray arm_vel_msg, science_msg;
-std_msgs__msg__Int32 syringe_msg, carousel_msg;
-std_msgs__msg__Float32 temp_msg, humidity_msg;
+// geometry_msgs__msg__Twist drivetrain_msg;
+//std_msgs__msg__UInt16MultiArray arm_msg;
+std_msgs__msg__Float32MultiArray arm_vel_msg;
 std_msgs__msg__Bool arm_home_msg;
 
-#define PANO_CAM_SERVO_PIN 5
-#define LEFT_DRIVE_PIN 6
-#define RIGHT_DRIVE_PIN 7
-#define SYRINGE_STEP_PIN 8
-#define SYRINGE_DIR_PIN 9
-#define AUGER_PIN 10
-#define PLUNGER_PIN 11
-#define CAROUSEL_STEP_PIN 12
-#define CAROUSEL_DIR_PIN 13
-#define TEMP_PIN A0
-#define HUMIDITY_PIN A1
+// #define PANO_CAM_SERVO_PIN 5
+#define LEFT_DRIVE_PIN 2
+#define RIGHT_DRIVE_PIN 3
+// #define SYRINGE_STEP_PIN 8
+// #define SYRINGE_DIR_PIN 9
+// #define AUGER_PIN 10
+// #define PLUNGER_PIN 11
+// #define CAROUSEL_STEP_PIN 12
+// #define CAROUSEL_DIR_PIN 13
+// #define TEMP_PIN A0
+// #define HUMIDITY_PIN A1
 
 const int stepperDelay = 100;
 const float tempSlope = 0.04;
@@ -64,10 +56,10 @@ double center2edge = wheelBase / 2.0;
 double maxLinearVelocity = 0.5;
 double maxSpinVelocity = 2.0;
 double maxWheelVelocity = maxLinearVelocity + maxSpinVelocity * center2edge;
-int pwmVals[3] = {1000, 1500, 2000};
+int pwmVals[3] = {0,90,180};
 float deadzone = 0.05;
 unsigned long lastCmdTime = 0;
-unsigned long cmdTimeout = 300;
+unsigned long cmdTimeout = 1000;
 
 uint16_t currentArmPos[6] = {6000, 7900, 4300, 6000, 4000, 6000};
 float armServoVels[6] = {0,0,0,0,0,0};
@@ -80,7 +72,9 @@ const uint16_t armServoBounds[6][2] = {
   {3000,9000}
 };
 
-PWMServo leftDrive, rightDrive, augerMotor, plungerMotor, panoCamServo;
+const float armVelDeadzone = 0.01;
+
+// PWMServo leftDrive, rightDrive;//, augerMotor, plungerMotor, panoCamServo;
 
 #define RCCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){error_loop();}}
 #define RCSOFTCHECK(fn) { rcl_ret_t temp_rc = fn; if ((temp_rc != RCL_RET_OK)){}}
@@ -88,112 +82,79 @@ PWMServo leftDrive, rightDrive, augerMotor, plungerMotor, panoCamServo;
 void error_loop(){
   while(1){
     digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-    delay(100);
+    delay(1000);
   }
 }
 
-void setDrivePWM(double left, double right);
-void setDriveNeutralPWM();
-void moveStepper(int stepPin, int dirPin, int stepCount);
+// void setDrivePWM(double left, double right);
+// void setDriveNeutralPWM();
 
-void drivetrainCallback(const void * msgin){
-  const geometry_msgs__msg__Twist * msg = (const geometry_msgs__msg__Twist *)msgin;
-  lastCmdTime = millis();
+// void drivetrainCallback(const void * msgin){
+//   const geometry_msgs__msg__Twist * msg = (const geometry_msgs__msg__Twist *)msgin;
+//   lastCmdTime = millis();
 
-  double linVel = (abs(msg->linear.x) < deadzone) ? 0.0 : msg->linear.x;
-  double spinVel = (abs(msg->angular.z) < deadzone) ? 0.0 : msg->angular.z;
+//   double linVel = (abs(msg->linear.x) < deadzone) ? 0.0 : msg->linear.x;
+//   double spinVel = (abs(msg->angular.z) < deadzone) ? 0.0 : msg->angular.z;
 
-  linVel = constrain(linVel, -maxLinearVelocity, maxLinearVelocity);
-  spinVel = constrain(spinVel, -maxSpinVelocity, maxSpinVelocity);
+//   linVel = constrain(linVel, -maxLinearVelocity, maxLinearVelocity);
+//   spinVel = constrain(spinVel, -maxSpinVelocity, maxSpinVelocity);
 
-  double leftDriveVel = linVel - spinVel * center2edge;
-  double rightDriveVel = linVel + spinVel * center2edge;
+//   double leftDriveVel = linVel - spinVel * center2edge;
+//   double rightDriveVel = linVel + spinVel * center2edge;
 
-  setDrivePWM(leftDriveVel, rightDriveVel);
-}
+//   setDrivePWM(leftDriveVel, rightDriveVel);
+// }
 
 void armCallback(const void * msgin){
   const std_msgs__msg__UInt16MultiArray * msg = (const std_msgs__msg__UInt16MultiArray *)msgin;
-  for (int i = 0; i < 6 && i < msg->data.size; i++){
+  for (size_t i = 0; i < 6 && i < msg->data.size; i++){
+    currentArmPos[i] = msg->data.data[i];
     maestro.setTarget(i, msg->data.data[i]);
   }
 }
 
 void armVelCallback(const void * msgin){
   const std_msgs__msg__Float32MultiArray * msg = (const std_msgs__msg__Float32MultiArray *)msgin;
-  for (int i = 0; i < 6 && i < msg->data.size; i++){
-    armServoVels[i] = msg->data.data[i];
+  for (size_t i = 0; i < 6 && i < msg->data.size; i++){
+    if (abs(msg->data.data[i]) < armVelDeadzone) {
+      armServoVels[i] = 0.0;
+    } else {
+      armServoVels[i] = msg->data.data[i];
+    }
   }
 }
 
 void armHomeCallback(const void * msgin){
   const std_msgs__msg__Bool * msg = (const std_msgs__msg__Bool *)msgin;
-  
   if (msg->data){maestro.goHome();}
 }
 
-void scienceModuleCallback(const void * msgin){
-  const std_msgs__msg__Float32MultiArray * msg = (const std_msgs__msg__Float32MultiArray *)msgin;
-  if (msg->data.size == 2){
-    augerMotor.write(constrain(msg->data.data[0], 1000, 2000));
-    plungerMotor.write(constrain(msg->data.data[1], 1000, 2000));
-  }
-}
+// void setDrivePWM(double left, double right){
+//   left = constrain(left, -maxWheelVelocity, maxWheelVelocity);
+//   right = constrain(right, -maxWheelVelocity, maxWheelVelocity);
 
-void syringeStepCallback(const void * msgin){
-  const std_msgs__msg__Int32 * msg = (const std_msgs__msg__Int32 *)msgin;
-  moveStepper(SYRINGE_STEP_PIN, SYRINGE_DIR_PIN, msg->data);
-}
-
-void carouselStepCallback(const void * msgin){
-  const std_msgs__msg__Int32 * msg = (const std_msgs__msg__Int32 *)msgin;
-  moveStepper(CAROUSEL_STEP_PIN, CAROUSEL_DIR_PIN, msg->data);
-}
-
-void panoCamServoCallback(const void * msgin){
-  const std_msgs__msg__UInt16MultiArray * msg = (const std_msgs__msg__UInt16MultiArray *)msgin;
-  if (msg->data.size){
-    panoCamServo.write(msg->data.data[0]);
-  }
-}
-
-void setDrivePWM(double left, double right){
-  left = constrain(left, -maxWheelVelocity, maxWheelVelocity);
-  right = constrain(right, -maxWheelVelocity, maxWheelVelocity);
-
-  int leftPWM = map(left, -maxWheelVelocity, maxWheelVelocity, pwmVals[0], pwmVals[2]);
-  int rightPWM = 2 * pwmVals[1] - map(right, -maxWheelVelocity, maxWheelVelocity, pwmVals[0], pwmVals[2]);
+//   int leftPWM, rightPWM;
   
-  leftDrive.write(leftPWM);
-  rightDrive.write(rightPWM);
-}
-
-void setDriveNeutralPWM() {
-  leftDrive.write(pwmVals[1]);
-  rightDrive.write(pwmVals[1]);
-}
-
-void moveStepper(int stepPin, int dirPin, int stepCount){
-  digitalWrite(dirPin, stepCount >= 0 ? HIGH : LOW);
-
-  for (int i = 0; i < abs(stepCount); i++){
-    digitalWrite(stepPin, HIGH);
-    delayMicroseconds(stepperDelay);
-    digitalWrite(stepPin, LOW);
-    delayMicroseconds(stepperDelay);
-  }
-}
-
-void calcTempAndHumidity(int tempRaw, int humidityRaw, float* result){
-  float tempVoltage = tempRaw * (3.3/1023.0);
-  float tempC = (tempVoltage * 1000) * tempSlope + tempIntercept;
-
-  float humidityVoltage = humidityRaw * (3.3/1023.0);
-  float humidity = (humidityVoltage * 1000) * humiditySlope + humidityIntercept;
+//   if (abs(left) < 0.01) {
+//     leftPWM = pwmVals[1];
+//   } else {
+//     leftPWM = (int)(pwmVals[1] + (left / maxWheelVelocity) * (pwmVals[2] - pwmVals[1]));
+//   }
   
-  result[0] = tempC;
-  result[1] = humidity;
-}
+//   if (abs(right) < 0.01) {
+//     rightPWM = pwmVals[1];
+//   } else {
+//     rightPWM = (int)(pwmVals[1] - (right / maxWheelVelocity) * (pwmVals[2] - pwmVals[1]));
+//   }
+  
+//   leftDrive.write(leftPWM);
+//   rightDrive.write(rightPWM);
+// }
+
+// void setDriveNeutralPWM() {
+//   leftDrive.write(pwmVals[1]);
+//   rightDrive.write(pwmVals[1]);
+// }
 
 void updateArmPos(){
   static unsigned long lastArmUpdate = 0;
@@ -204,100 +165,88 @@ void updateArmPos(){
     float dt = (currentTime - lastArmUpdate) / 1000.0;
     
     for (int i = 0; i < 6; i++){
-      float newPos = currentArmPos[i] + armServoVels[i] * dt;
-      
-      currentArmPos[i] = constrain(newPos, armServoBounds[i][0], armServoBounds[i][1]);
-      
-      maestro.setTarget(i, currentArmPos[i]);
+      if (abs(armServoVels[i]) > armVelDeadzone) {
+        float newPos = currentArmPos[i] + armServoVels[i] * dt;
+        currentArmPos[i] = constrain(newPos, armServoBounds[i][0], armServoBounds[i][1]);
+        maestro.setTarget(i, currentArmPos[i]);
+      }
     }
   }
   
   lastArmUpdate = currentTime;
 }
 
-void setup(){
+void setup() {
   Serial.begin(115200);
   maestroSerial.begin(9600);
 
-  leftDrive.attach(LEFT_DRIVE_PIN);
-  rightDrive.attach(RIGHT_DRIVE_PIN);
-  setDriveNeutralPWM();
+  // 1. Spark Max PWM Range Fix
+  // Most Spark Max controllers expect 1000us to 2000us. 
+  // PWMServo defaults can vary, so we force the limits here.
+  // leftDrive.attach(LEFT_DRIVE_PIN, 1000, 2000);
+  // rightDrive.attach(RIGHT_DRIVE_PIN, 1000, 2000);
   
-  augerMotor.attach(AUGER_PIN);
-  plungerMotor.attach(PLUNGER_PIN);
+  // // Set to Neutral immediately
+  // leftDrive.write(90); 
+  // rightDrive.write(90);
 
-  panoCamServo.attach(PANO_CAM_SERVO_PIN);
-  panoCamServo.write(67);
-
-  pinMode(SYRINGE_STEP_PIN, OUTPUT);
-  pinMode(SYRINGE_DIR_PIN, OUTPUT);
-  pinMode(CAROUSEL_STEP_PIN, OUTPUT);
-  pinMode(CAROUSEL_DIR_PIN, OUTPUT);
+  // // 2. Hardware Pins
+  // augerMotor.attach(AUGER_PIN);
+  // plungerMotor.attach(PLUNGER_PIN);
+  // panoCamServo.attach(PANO_CAM_SERVO_PIN);
+  // panoCamServo.write(67);
+  
+  // pinMode(SYRINGE_STEP_PIN, OUTPUT);
+  // pinMode(SYRINGE_DIR_PIN, OUTPUT);
+  // pinMode(CAROUSEL_STEP_PIN, OUTPUT);
+  // pinMode(CAROUSEL_DIR_PIN, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
 
+  // 3. Micro-ROS Transport & Support
   set_microros_transports();
   delay(2000);
 
   allocator = rcl_get_default_allocator();
   RCCHECK(rclc_support_init(&support, 0, NULL, &allocator));
-
   RCCHECK(rclc_node_init_default(&node, "teensy_node", "", &support));
 
-  RCCHECK(rclc_subscription_init_default(&sub_twist, &node, ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist), "cmd_vel"));
-  RCCHECK(rclc_subscription_init_default(&sub_arm, &node, ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, UInt16MultiArray), "arm_positions"));
-  RCCHECK(rclc_subscription_init_default(&sub_science, &node, ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float32MultiArray), "science_module"));
-  RCCHECK(rclc_subscription_init_default(&sub_syringe, &node, ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Int32), "syringe_count"));
-  RCCHECK(rclc_subscription_init_default(&sub_carousel, &node, ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Int32), "carousel_count"));
-  RCCHECK(rclc_subscription_init_default(&sub_camera, &node, ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, UInt16MultiArray), "camera_servo_angle"));
+  // 4. Subscriptions
+  // RCCHECK(rclc_subscription_init_default(&sub_twist, &node, ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist), "cmd_vel"));
+  // RCCHECK(rclc_subscription_init_default(&sub_arm, &node, ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, UInt16MultiArray), "arm_positions"));
   RCCHECK(rclc_subscription_init_default(&sub_arm_vel, &node, ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float32MultiArray), "arm_velocities"));
   RCCHECK(rclc_subscription_init_default(&sub_arm_home, &node, ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Bool), "arm_home"));
 
-  RCCHECK(rclc_publisher_init_default(&pub_temp, &node, ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float32), "temperature"));
-  RCCHECK(rclc_publisher_init_default(&pub_humidity, &node, ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float32), "humidity"));
-
-  const int num_handles = 8;
-  RCCHECK(rclc_executor_init(&executor, &support.context, num_handles, &allocator));
-  
-  RCCHECK(rclc_executor_add_subscription(&executor, &sub_twist, &drivetrain_msg, &drivetrainCallback, ON_NEW_DATA));
-  RCCHECK(rclc_executor_add_subscription(&executor, &sub_arm, &arm_msg, &armCallback, ON_NEW_DATA));
-  RCCHECK(rclc_executor_add_subscription(&executor, &sub_science, &science_msg, &scienceModuleCallback, ON_NEW_DATA));
-  RCCHECK(rclc_executor_add_subscription(&executor, &sub_syringe, &syringe_msg, &syringeStepCallback, ON_NEW_DATA));
-  RCCHECK(rclc_executor_add_subscription(&executor, &sub_carousel, &carousel_msg, &carouselStepCallback, ON_NEW_DATA));
-  RCCHECK(rclc_executor_add_subscription(&executor, &sub_camera, &camera_msg, &panoCamServoCallback, ON_NEW_DATA));
-  RCCHECK(rclc_executor_add_subscription(&executor, &sub_arm_vel, &arm_vel_msg, &armVelCallback, ON_NEW_DATA));
-  RCCHECK(rclc_executor_add_subscription(&executor, &sub_arm_home, &arm_home_msg, &armHomeCallback, ON_NEW_DATA));
-
+  // 5. CRITICAL: Memory Allocation for MultiArrays
+  // Without this, the executor will crash when receiving arm data
   arm_msg.data.capacity = 6;
-  arm_msg.data.size = 0;
   arm_msg.data.data = (uint16_t*) malloc(arm_msg.data.capacity * sizeof(uint16_t));
-  
-  science_msg.data.capacity = 2;
-  science_msg.data.size = 0;
-  science_msg.data.data = (float*) malloc(science_msg.data.capacity * sizeof(float));
-  
-  camera_msg.data.capacity = 1;
-  camera_msg.data.size = 0;
-  camera_msg.data.data = (uint16_t*) malloc(camera_msg.data.capacity * sizeof(uint16_t));
+  arm_msg.data.size = 0;
 
   arm_vel_msg.data.capacity = 6;
-  arm_vel_msg.data.size = 0;
   arm_vel_msg.data.data = (float*) malloc(arm_vel_msg.data.capacity * sizeof(float));
+  arm_vel_msg.data.size = 0;
+
+  // 6. Executor Initialization
+  const int num_handles = 2;
+  RCCHECK(rclc_executor_init(&executor, &support.context, num_handles, &allocator));
+  // RCCHECK(rclc_executor_add_subscription(&executor, &sub_twist, &drivetrain_msg, &drivetrainCallback, ON_NEW_DATA));
+  // RCCHECK(rclc_executor_add_subscription(&executor, &sub_arm, &arm_msg, &armCallback, ON_NEW_DATA));
+  RCCHECK(rclc_executor_add_subscription(&executor, &sub_arm_vel, &arm_vel_msg, &armVelCallback, ON_NEW_DATA));
+  RCCHECK(rclc_executor_add_subscription(&executor, &sub_arm_home, &arm_home_msg, &armHomeCallback, ON_NEW_DATA));
 }
 
-void loop(){
-  RCSOFTCHECK(rclc_executor_spin_some(&executor, RCL_MS_TO_NS(100)));
+void loop() {
+  // Handle micro-ROS callbacks (Timeout 10ms for responsiveness)
+  RCSOFTCHECK(rclc_executor_spin_some(&executor, RCL_MS_TO_NS(10)));
 
-  if (millis() - lastCmdTime > cmdTimeout){setDriveNeutralPWM();}
+  // Safety: Stop motors if we lose the heartbeat from the ROS master
+  // if (millis() - lastCmdTime > cmdTimeout) {
+  //   setDriveNeutralPWM();
+  // }
 
+  // Handle arm velocity integration
   updateArmPos();
 
-  float tempAndHumidity[2];
-  calcTempAndHumidity(analogRead(TEMP_PIN), analogRead(HUMIDITY_PIN), tempAndHumidity);
-  temp_msg.data = tempAndHumidity[0];
-  humidity_msg.data = tempAndHumidity[1];
-
-  RCSOFTCHECK(rcl_publish(&pub_temp, &temp_msg, NULL));
-  RCSOFTCHECK(rcl_publish(&pub_humidity, &humidity_msg, NULL));
-
-  delay(100);
+  // Small delay to maintain roughly 100Hz frequency
+  delay(10);
 }

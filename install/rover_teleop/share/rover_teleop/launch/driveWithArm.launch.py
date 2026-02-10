@@ -29,23 +29,23 @@ def generate_launch_description():
             output='screen'
         ),
         
-        # Joystick 1 (arm) - /dev/input/js1 → j1 topic
-        Node(
-            package='joy',
-            executable='joy_node',
-            name='joy1',
-            parameters=[{
-                'device_id': 1,
-                'dev': '/dev/input/js1'
-            }],
-            remappings=[('joy', 'j1')],
-            output='screen'
-        ),
+        # # Joystick 1 (arm) - /dev/input/js1 → j1 topic
+        # Node(
+        #     package='joy',
+        #     executable='joy_node',
+        #     name='joy1',
+        #     parameters=[{
+        #         'device_id': 1,
+        #         'dev': '/dev/input/js1'
+        #     }],
+        #     remappings=[('joy', 'j1')],
+        #     output='screen'
+        # ),
         
         # Drivetrain control
         Node(
             package='rover_teleop',
-            executable='drivetrainOps.py',
+            executable='drivetrain_ops',
             name='drivetrainOps',
             parameters=[paramsFile],
             output='screen'
@@ -54,7 +54,7 @@ def generate_launch_description():
         # Arm control
         Node(
             package='rover_teleop',
-            executable='armOps.py',
+            executable='arm_teleop_joy',
             name='armOps',
             parameters=[paramsFile],
             output='screen'

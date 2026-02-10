@@ -55,7 +55,7 @@ class ArmTeleopJoy(Node):
         # Subscriber for joystick
         self.joy_sub = self.create_subscription(
             Joy,
-            '/j1',
+            '/j0',
             self.joy_callback,
             10
         )

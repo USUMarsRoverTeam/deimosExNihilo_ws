@@ -1,1 +1,1 @@
-/home/deimos/uros_ws/install/micro_ros_agent:/home/deimos/uros_ws/install/micro_ros_msgs:/home/deimos/microros_teensy_ws/install/micro_ros_setup:/opt/ros/jazzy
+/home/deimos/deimosExNihilo_ws/install/drive_base_msgs:/home/deimos/deimosExNihilo_ws/install/rover_teleop:/home/deimos/deimosExNihilo_ws/install/micro_ros_setup:/home/deimos/deimosExNihilo_ws/install/micro_ros_agent:/home/deimos/deimosExNihilo_ws/install/micro_ros_msgs:/opt/ros/jazzy

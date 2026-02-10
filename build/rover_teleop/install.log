@@ -16,4 +16,4 @@
 /home/deimos/deimosExNihilo_ws/install/rover_teleop/lib/python3.12/site-packages/rover_teleop-0.0.0-py3.12.egg-info/entry_points.txt
 /home/deimos/deimosExNihilo_ws/install/rover_teleop/lib/python3.12/site-packages/rover_teleop-0.0.0-py3.12.egg-info/zip-safe
 /home/deimos/deimosExNihilo_ws/install/rover_teleop/lib/rover_teleop/arm_teleop_joy
-/home/deimos/deimosExNihilo_ws/install/rover_teleop/lib/rover_teleop/joy_to_twist
+/home/deimos/deimosExNihilo_ws/install/rover_teleop/lib/rover_teleop/drivetrain_ops

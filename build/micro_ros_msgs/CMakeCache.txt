@@ -246,12 +246,6 @@ CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 //Name of the computer/site where compile is being run
 SITE:STRING=deimos-groundStation
 
-//No help, variable specified on the command line.
-UAGENT_BUILD_EXECUTABLE:UNINITIALIZED=OFF
-
-//No help, variable specified on the command line.
-UAGENT_P2P_PROFILE:UNINITIALIZED=OFF
-
 //Path to a library.
 _lib:FILEPATH=/opt/ros/jazzy/lib/librosidl_typesupport_cpp.so
 

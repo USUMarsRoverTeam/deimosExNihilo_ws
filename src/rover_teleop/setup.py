@@ -32,8 +32,8 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'arm_teleop_joy = rover_teleop.arm_teleop_joy:main',
-            'joy_to_twist = rover_teleop.joy_to_twist:main',
+            'arm_teleop_joy = rover_teleop.armOps:main',
+            'drivetrain_ops = rover_teleop.drivetrainOps:main',
         ],
     },
 )
