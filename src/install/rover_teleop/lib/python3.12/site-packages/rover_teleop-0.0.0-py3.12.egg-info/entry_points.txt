@@ -1,0 +1,3 @@
+[console_scripts]
+arm_teleop_joy = rover_teleop.arm_teleop_joy:main
+joy_to_twist = rover_teleop.joy_to_twist:main
